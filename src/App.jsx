@@ -1,12 +1,12 @@
 import { useState } from 'react';
 
 import {
-	Activity,
-	ArrowUpRight,
+	// Activity,
+	// ArrowUpRight,
 	House,
 	Lightbulb,
 	Plug,
-	Settings2,
+	// Settings2,
 	Zap
 } from 'lucide-react';
 
@@ -40,7 +40,9 @@ const breakers = [
 	}
 ];
 
-function Header() {
+function Header({ enabledCount, totalCount }) {
+	const allEnabled = enabledCount === totalCount;
+
 	return (
 		<header className='flex flex-wrap items-center justify-between gap-4 border-b border-white/8 pb-6'>
 			<div className='flex items-center gap-3'>
@@ -58,10 +60,24 @@ function Header() {
 				</div>
 			</div>
 
-			<div className='flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/[0.07] px-3 py-2'>
-				<span className='h-2 w-2 rounded-full bg-emerald-400' />
-				<span className='text-xs font-medium text-emerald-300'>
-					3 / 3 ЛИНИИ ВКЛЮЧЕНЫ
+			<div
+				className={`flex items-center gap-2 rounded-full border px-3 py-2 ${
+					allEnabled
+						? 'border-emerald-400/20 bg-emerald-400/[0.07]'
+						: 'border-amber-400/20 bg-amber-400/[0.07]'
+				}`}
+			>
+				<span
+					className={`h-2 w-2 rounded-full ${
+						allEnabled ? 'bg-emerald-400' : 'bg-amber-400'
+					}`}
+				/>
+				<span
+					className={`text-xs font-medium ${
+						allEnabled ? 'text-emerald-300' : 'text-amber-300'
+					}`}
+				>
+					{enabledCount} / {totalCount} ЛИНИИ ВКЛЮЧЕНЫ
 				</span>
 			</div>
 		</header>
@@ -174,34 +190,13 @@ function ApartmentMap() {
 
 			<div className='p-4 sm:p-6'>
 				<div className='relative flex min-h-75 items-center justify-center overflow-hidden rounded-xl border border-white/6 bg-[#0a1019] p-6'>
-					<div
-						aria-hidden='true'
-						className='pointer-events-none absolute inset-0 opacity-20'
-						style={{
-							backgroundImage:
-								'linear-gradient(#263548 1px, transparent 1px), linear-gradient(90deg, #263548 1px, transparent 1px)',
-							backgroundSize: '24px 24px'
-						}}
-					/>
-
-					<div className='relative max-w-sm text-center'>
-						<div className='mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-cyan-400/20 bg-cyan-400/6'>
-							<House size={28} className='text-cyan-300' />
-						</div>
-
-						<h3 className='mt-5 font-medium text-slate-200'>
-							Здесь будет твоя квартира
-						</h3>
-
-						<p className='mx-auto mt-2 max-w-xs text-sm leading-6 text-slate-500'>
-							Подключим чистую схему, разместим точки электрики и привяжем
-							каждую к нужному рубильнику.
-						</p>
-
-						<div className='mt-5 inline-flex items-center gap-2 rounded-lg border border-white/8 bg-white/2 px-3 py-2 text-xs text-slate-400'>
-							<Settings2 size={14} />
-							Схема ожидает подключения
-						</div>
+					<div className='overflow-hidden rounded-xl border border-white/6 bg-black'>
+						<img
+							src='/public/images/apartment-plan.png'
+							alt='Apartment floor plan / План квартири'
+							className='block h-auto w-full select-none bg-[#0a1019]'
+							draggable='false'
+						/>
 					</div>
 				</div>
 
@@ -231,30 +226,39 @@ function ApartmentMap() {
 	);
 }
 
-function StatusPanel() {
-	return (
-		<aside className='flex flex-col justify-between gap-4 rounded-2xl border border-white/8 bg-[#0e141e] p-5 sm:flex-row sm:items-center'>
-			<div className='flex items-start gap-3'>
-				<div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-400/10 text-emerald-300'>
-					<Activity size={20} />
-				</div>
+// function StatusPanel({ enabledCount, totalCount }) {
+// 	const allEnabled = enabledCount === totalCount;
+// 	const allDisabled = enabledCount === 0;
 
-				<div>
-					<h2 className='font-medium text-white'>Все линии включены</h2>
-					<p className='mt-1 text-sm leading-5 text-slate-500'>
-						Визуальное состояние панели. Реальное наличие напряжения приложение
-						не измеряет.
-					</p>
-				</div>
-			</div>
+// 	const message = allEnabled
+// 		? 'Все линии включены'
+// 		: allDisabled
+// 			? 'Все линии отключены'
+// 			: `Включено линий: ${enabledCount} из ${totalCount}`;
 
-			<div className='flex items-center gap-2 text-xs text-slate-500'>
-				<span>HOME POWER</span>
-				<ArrowUpRight size={14} />
-			</div>
-		</aside>
-	);
-}
+// 	return (
+// 		<aside className='flex flex-col justify-between gap-4 rounded-2xl border border-white/8 bg-[#0e141e] p-5 sm:flex-row sm:items-center'>
+// 			<div className='flex items-start gap-3'>
+// 				<div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-400/10 text-emerald-300'>
+// 					<Activity size={20} />
+// 				</div>
+
+// 				<div>
+// 					<h2 className='font-medium text-white'>{message}</h2>
+// 					<p className='mt-1 text-sm leading-5 text-slate-500'>
+// 						Визуальное состояние панели. Реальное наличие напряжения приложение
+// 						не измеряет.
+// 					</p>
+// 				</div>
+// 			</div>
+
+// 			<div className='flex items-center gap-2 text-xs text-slate-500'>
+// 				<span>HOME POWER</span>
+// 				<ArrowUpRight size={14} />
+// 			</div>
+// 		</aside>
+// 	);
+// }
 
 function App() {
 	const [breakerStates, setBreakerStates] = useState({
@@ -263,10 +267,13 @@ function App() {
 		yellow: true
 	});
 
+	const enabledCount = Object.values(breakerStates).filter(Boolean).length;
+	const totalCount = breakers.length;
+
 	return (
 		<main className='min-h-screen bg-[#090d14] px-4 py-6 text-slate-100 sm:px-6 sm:py-9 lg:px-10'>
 			<div className='mx-auto max-w-7xl'>
-				<Header />
+				<Header enabledCount={enabledCount} totalCount={totalCount} />
 
 				<section className='mt-8'>
 					<div className='mb-5'>
@@ -305,9 +312,9 @@ function App() {
 					<ApartmentMap />
 				</section>
 
-				<section className='mt-4'>
-					<StatusPanel />
-				</section>
+				{/* <section className='mt-4'>
+					<StatusPanel enabledCount={enabledCount} totalCount={totalCount} />
+				</section> */}
 
 				<footer className='mt-8 flex flex-wrap items-center justify-between gap-2 border-t border-white/6 pt-5 text-xs text-slate-600'>
 					<span>HOME POWER © 2026</span>
