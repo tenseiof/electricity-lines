@@ -12,31 +12,156 @@ import {
 
 const breakers = [
 	{
-		id: 'green',
+		id: 'teal',
 		number: '01',
 		name: 'Линия 1',
-		color: 'green',
+		color: 'teal',
 		description: 'Розетка и освещение',
 		icon: Lightbulb,
 		status: 'Включена'
 	},
 	{
-		id: 'cyan',
+		id: 'blue',
 		number: '02',
 		name: 'Линия 2',
-		color: 'cyan',
+		color: 'blue',
 		description: 'Розетки',
 		icon: Plug,
 		status: 'Включена'
 	},
 	{
-		id: 'yellow',
+		id: 'rose',
 		number: '03',
 		name: 'Линия 3',
-		color: 'yellow',
+		color: 'rose',
 		description: '2 розетки',
 		icon: Zap,
 		status: 'Включена'
+	}
+];
+
+const electricalPoints = [
+	// Line 1 — lighting + 1 socket
+	{
+		id: 'line-1-socket-01',
+		label: 'Socket 01',
+		breakerId: 'teal',
+		x: 53.5,
+		y: 18.8
+	},
+
+	// Line 2 — 10 sockets
+	{
+		id: 'line-2-socket-01',
+		label: 'Socket 01',
+		breakerId: 'blue',
+		x: 20.2,
+		y: 4.6
+	},
+	{
+		id: 'line-2-socket-02',
+		label: 'Socket 02',
+		breakerId: 'blue',
+		x: 66.6,
+		y: 9.0
+	},
+	{
+		id: 'line-2-socket-03',
+		label: 'Socket 03',
+		breakerId: 'blue',
+		x: 91.1,
+		y: 4.6
+	},
+	{
+		id: 'line-2-socket-04',
+		label: 'Socket 04',
+		breakerId: 'blue',
+		x: 17.7,
+		y: 26.4
+	},
+	{
+		id: 'line-2-socket-05',
+		label: 'Socket 05',
+		breakerId: 'blue',
+		x: 36.3,
+		y: 29.9
+	},
+	{
+		id: 'line-2-socket-06',
+		label: 'Socket 06',
+		breakerId: 'blue',
+		x: 20.9,
+		y: 36.1
+	},
+	{
+		id: 'line-2-socket-07',
+		label: 'Socket 07',
+		breakerId: 'blue',
+		x: 70.1,
+		y: 34.4
+	},
+	{
+		id: 'line-2-socket-08',
+		label: 'Socket 08',
+		breakerId: 'blue',
+		x: 91.1,
+		y: 34.4
+	},
+	{
+		id: 'line-2-socket-09',
+		label: 'Socket 09',
+		breakerId: 'blue',
+		x: 29.6,
+		y: 68.0
+	},
+	{
+		id: 'line-2-socket-10',
+		label: 'Socket 10',
+		breakerId: 'blue',
+		x: 42.0,
+		y: 68.0
+	},
+
+	// Line 3 — 2 sockets
+
+	{
+		id: 'line-3-socket-02',
+		label: 'Socket 02',
+		breakerId: 'rose',
+		x: 43.6,
+		y: 84.5
+	},
+	{
+		id: 'line-3-socket-01',
+		label: 'Socket 01',
+		breakerId: 'rose',
+		x: 24.2,
+		y: 90.0
+	},
+
+	// Auxiliary Line A — 2 sockets
+	{
+		id: 'aux-a-socket-01',
+		label: 'Auxiliary A · Socket 01',
+		breakerId: 'auxA',
+		x: 42.3,
+		y: 64.9
+	},
+	{
+		id: 'aux-a-socket-02',
+		label: 'Auxiliary A · Socket 02',
+		breakerId: 'auxA',
+		x: 9.8,
+		y: 64.9
+	},
+
+	// Auxiliary Line B — 1 socket
+	{
+		id: 'aux-b-socket-01',
+		label: 'Auxiliary B · Socket 01',
+		breakerId: 'auxB',
+		x: 60.5,
+		y: 18.9
 	}
 ];
 
@@ -88,7 +213,7 @@ function BreakerCard({ breaker, isEnabled, onToggle }) {
 	const Icon = breaker.icon;
 
 	const colors = {
-		green: {
+		teal: {
 			border: 'border-emerald-400/20',
 			background: 'bg-emerald-400/[0.05]',
 			icon: 'bg-emerald-400/10 text-emerald-300',
@@ -96,7 +221,7 @@ function BreakerCard({ breaker, isEnabled, onToggle }) {
 			text: 'text-emerald-300',
 			toggle: 'bg-emerald-400'
 		},
-		cyan: {
+		blue: {
 			border: 'border-cyan-400/20',
 			background: 'bg-cyan-400/[0.05]',
 			icon: 'bg-cyan-400/10 text-cyan-300',
@@ -104,7 +229,7 @@ function BreakerCard({ breaker, isEnabled, onToggle }) {
 			text: 'text-cyan-300',
 			toggle: 'bg-cyan-400'
 		},
-		yellow: {
+		rose: {
 			border: 'border-amber-400/20',
 			background: 'bg-amber-400/[0.05]',
 			icon: 'bg-amber-400/10 text-amber-300',
@@ -171,7 +296,7 @@ function BreakerCard({ breaker, isEnabled, onToggle }) {
 	);
 }
 
-function ApartmentMap() {
+function ApartmentMap({ breakerStates }) {
 	return (
 		<section className='overflow-hidden rounded-2xl border border-white/8 bg-[#0e141e]'>
 			<div className='flex flex-wrap items-center justify-between gap-3 border-b border-white/8 px-5 py-4'>
@@ -190,13 +315,49 @@ function ApartmentMap() {
 
 			<div className='p-4 sm:p-6'>
 				<div className='relative flex min-h-75 items-center justify-center overflow-hidden rounded-xl border border-white/6 bg-[#0a1019] p-6'>
-					<div className='overflow-hidden rounded-xl border border-white/6 bg-black'>
+					<div className='relative overflow-hidden rounded-xl border border-white/6 bg-black'>
 						<img
-							src='/public/images/apartment-plan.png'
-							alt='Apartment floor plan / План квартири'
-							className='block h-auto w-full select-none bg-[#0a1019]'
+							src='/images/apartment-plan.png'
+							alt='Apartment floor plan'
+							className='block h-auto w-full select-none'
 							draggable='false'
 						/>
+
+						{electricalPoints.map(point => {
+							const pointColors = {
+								teal: '#5EEAD4',
+								blue: '#60A5FA',
+								rose: '#D97786',
+								auxA: '#C4B5FD',
+								auxB: '#C49A6C'
+							};
+
+							const isEnabled = breakerStates[point.breakerId] ?? true;
+							const color = pointColors[point.breakerId];
+
+							return (
+								<button
+									key={point.id}
+									type='button'
+									title={point.label}
+									aria-label={`${point.label} — ${isEnabled ? 'ON' : 'OFF'}`}
+									className='absolute z-10 rounded-full border-2 transition-all duration-300'
+									style={{
+										left: `${point.x}%`,
+										top: `${point.y}%`,
+										width: '13px',
+										height: '13px',
+										transform: 'translate(-50%, -50%)',
+										backgroundColor: isEnabled ? color : '#64748b',
+										borderColor: isEnabled ? '#ffffff' : '#94a3b8',
+										boxShadow: isEnabled
+											? `0 0 8px ${color}, 0 0 18px ${color}80`
+											: 'none',
+										opacity: isEnabled ? 1 : 0.55
+									}}
+								/>
+							);
+						})}
 					</div>
 				</div>
 
@@ -205,9 +366,9 @@ function ApartmentMap() {
 						<div key={breaker.id} className='flex items-center gap-2'>
 							<span
 								className={`h-2.5 w-2.5 rounded-full ${
-									breaker.color === 'green'
+									breaker.color === 'teal'
 										? 'bg-emerald-400'
-										: breaker.color === 'cyan'
+										: breaker.color === 'blue'
 											? 'bg-cyan-400'
 											: 'bg-amber-400'
 								}`}
@@ -262,9 +423,9 @@ function ApartmentMap() {
 
 function App() {
 	const [breakerStates, setBreakerStates] = useState({
-		green: true,
-		cyan: true,
-		yellow: true
+		teal: true,
+		blue: true,
+		rose: true
 	});
 
 	const enabledCount = Object.values(breakerStates).filter(Boolean).length;
@@ -309,7 +470,7 @@ function App() {
 				</section>
 
 				<section className='mt-8'>
-					<ApartmentMap />
+					<ApartmentMap breakerStates={breakerStates} />
 				</section>
 
 				{/* <section className='mt-4'>
