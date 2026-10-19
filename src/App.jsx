@@ -1,42 +1,69 @@
 import { useState } from 'react';
 
-import {
-	// Activity,
-	// ArrowUpRight,
-	House,
-	Lightbulb,
-	Plug,
-	// Settings2,
-	Zap
-} from 'lucide-react';
+import { House, Lightbulb, Plug, Zap, Monitor, Heater } from 'lucide-react';
+
+const LINE_COLORS = {
+	teal: '#5EEAD4',
+	blue: '#60A5FA',
+	rose: '#D97786',
+	auxA: '#C4B5FD',
+	auxB: '#C49A6C'
+};
 
 const breakers = [
+	// Line 1 — розетки и свет
 	{
 		id: 'teal',
 		number: '01',
-		name: 'Линия 1',
+		name: 'Лінія 1',
 		color: 'teal',
-		description: 'Розетка и освещение',
+		description: 'Розетка та освітлення',
 		icon: Lightbulb,
-		status: 'Включена'
+		status: 'ON'
 	},
+
+	// Line 2 — розетки
 	{
 		id: 'blue',
 		number: '02',
-		name: 'Линия 2',
+		name: 'Лінія 2',
 		color: 'blue',
-		description: 'Розетки',
+		description: '10 розеток',
 		icon: Plug,
-		status: 'Включена'
+		status: 'ON'
 	},
+
+	// Line 3 — розетки
 	{
 		id: 'rose',
 		number: '03',
-		name: 'Линия 3',
+		name: 'Лінія 3',
 		color: 'rose',
 		description: '2 розетки',
-		icon: Zap,
-		status: 'Включена'
+		icon: Plug,
+		status: 'ON'
+	},
+
+	// Auxiliary A — комп'ютер
+	{
+		id: 'auxA',
+		number: '04',
+		name: 'Додаткова лінія A',
+		color: 'auxA',
+		description: 'Комп’ютер · 2 розетки',
+		icon: Monitor,
+		status: 'ON'
+	},
+
+	// Auxiliary B — комп'ютер
+	{
+		id: 'auxB',
+		number: '05',
+		name: 'Додаткова лінія B',
+		color: 'auxB',
+		description: 'Бойлер · 1 розетка',
+		icon: Heater,
+		status: 'ON'
 	}
 ];
 
@@ -188,21 +215,21 @@ function Header({ enabledCount, totalCount }) {
 			<div
 				className={`flex items-center gap-2 rounded-full border px-3 py-2 ${
 					allEnabled
-						? 'border-emerald-400/20 bg-emerald-400/[0.07]'
-						: 'border-amber-400/20 bg-amber-400/[0.07]'
+						? 'border-cyan-400/20 bg-cyan-400/10'
+						: 'border-amber-400/20 bg-amber-400/10'
 				}`}
 			>
 				<span
 					className={`h-2 w-2 rounded-full ${
-						allEnabled ? 'bg-emerald-400' : 'bg-amber-400'
+						allEnabled ? 'bg-cyan-400' : 'bg-amber-400'
 					}`}
 				/>
 				<span
 					className={`text-xs font-medium ${
-						allEnabled ? 'text-emerald-300' : 'text-amber-300'
+						allEnabled ? 'text-cyan-300' : 'text-amber-300'
 					}`}
 				>
-					{enabledCount} / {totalCount} ЛИНИИ ВКЛЮЧЕНЫ
+					{enabledCount} / {totalCount} ЛІНІЇ ПІДКЛЮЧЕНІ
 				</span>
 			</div>
 		</header>
@@ -212,42 +239,23 @@ function Header({ enabledCount, totalCount }) {
 function BreakerCard({ breaker, isEnabled, onToggle }) {
 	const Icon = breaker.icon;
 
-	const colors = {
-		teal: {
-			border: 'border-emerald-400/20',
-			background: 'bg-emerald-400/[0.05]',
-			icon: 'bg-emerald-400/10 text-emerald-300',
-			dot: 'bg-emerald-400',
-			text: 'text-emerald-300',
-			toggle: 'bg-emerald-400'
-		},
-		blue: {
-			border: 'border-cyan-400/20',
-			background: 'bg-cyan-400/[0.05]',
-			icon: 'bg-cyan-400/10 text-cyan-300',
-			dot: 'bg-cyan-400',
-			text: 'text-cyan-300',
-			toggle: 'bg-cyan-400'
-		},
-		rose: {
-			border: 'border-amber-400/20',
-			background: 'bg-amber-400/[0.05]',
-			icon: 'bg-amber-400/10 text-amber-300',
-			dot: 'bg-amber-400',
-			text: 'text-amber-300',
-			toggle: 'bg-amber-400'
-		}
-	};
-
-	const style = colors[breaker.color];
+	const color = LINE_COLORS[breaker.color];
 
 	return (
 		<article
-			className={`rounded-2xl border ${style.border} ${style.background} p-5 transition duration-200 hover:-translate-y-1 hover:bg-white/4`}
+			className='rounded-2xl border p-5 transition duration-200 hover:-translate-y-1 hover:bg-white/4'
+			style={{
+				borderColor: `${color}33`,
+				backgroundColor: `${color}0D`
+			}}
 		>
 			<div className='flex items-start justify-between'>
 				<div
-					className={`flex h-11 w-11 items-center justify-center rounded-xl ${style.icon}`}
+					className={`flex h-11 w-11 items-center justify-center rounded-xl`}
+					style={{
+						backgroundColor: `${color}1A`,
+						color
+					}}
 				>
 					<Icon size={22} />
 				</div>
@@ -267,11 +275,14 @@ function BreakerCard({ breaker, isEnabled, onToggle }) {
 				<div className='flex items-center gap-2'>
 					<span
 						className={`h-2 w-2 rounded-full ${
-							isEnabled ? style.dot : 'bg-slate-600'
+							isEnabled ? '' : 'bg-slate-600'
 						}`}
+						style={{
+							backgroundColor: isEnabled ? color : undefined
+						}}
 					/>
-					<span className={`text-xs font-medium ${style.text}`}>
-						{isEnabled ? 'Включена' : 'Отключена'}
+					<span className='text-xs font-medium' style={{ color }}>
+						{isEnabled ? 'Увімкнена' : 'Вимкнена'}
 					</span>
 				</div>
 
@@ -282,8 +293,11 @@ function BreakerCard({ breaker, isEnabled, onToggle }) {
 					aria-label={`${breaker.name}: ${isEnabled ? 'выключить' : 'включить'}`}
 					onClick={onToggle}
 					className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
-						isEnabled ? style.toggle : 'bg-slate-700'
+						isEnabled ? '' : 'bg-slate-700'
 					}`}
+					style={{
+						backgroundColor: isEnabled ? color : undefined
+					}}
 				>
 					<span
 						className={`absolute top-1 h-4 w-4 rounded-full bg-slate-950 shadow transition-all ${
@@ -303,8 +317,10 @@ function ApartmentMap({ breakerStates }) {
 				<div className='flex items-center gap-3'>
 					<House size={18} className='text-slate-400' />
 					<div>
-						<h2 className='font-semibold text-white'>Схема квартиры</h2>
-						<p className='mt-1 text-xs text-slate-500'>План электроснабжения</p>
+						<h2 className='font-semibold text-white'>Схема квартири</h2>
+						<p className='mt-1 text-xs text-slate-500'>
+							План електропостачання
+						</p>
 					</div>
 				</div>
 
@@ -324,16 +340,8 @@ function ApartmentMap({ breakerStates }) {
 						/>
 
 						{electricalPoints.map(point => {
-							const pointColors = {
-								teal: '#5EEAD4',
-								blue: '#60A5FA',
-								rose: '#D97786',
-								auxA: '#C4B5FD',
-								auxB: '#C49A6C'
-							};
-
 							const isEnabled = breakerStates[point.breakerId] ?? true;
-							const color = pointColors[point.breakerId];
+							const color = LINE_COLORS[point.breakerId];
 
 							return (
 								<button
@@ -365,67 +373,28 @@ function ApartmentMap({ breakerStates }) {
 					{breakers.map(breaker => (
 						<div key={breaker.id} className='flex items-center gap-2'>
 							<span
-								className={`h-2.5 w-2.5 rounded-full ${
-									breaker.color === 'teal'
-										? 'bg-emerald-400'
-										: breaker.color === 'blue'
-											? 'bg-cyan-400'
-											: 'bg-amber-400'
-								}`}
+								className='h-2.5 w-2.5 shrink-0 rounded-full'
+								style={{
+									backgroundColor: LINE_COLORS[breaker.color]
+								}}
 							/>
+
 							<span className='text-xs text-slate-400'>{breaker.name}</span>
 						</div>
 					))}
-
-					<div className='flex items-center gap-2'>
-						<span className='h-2.5 w-2.5 rounded-full bg-red-400' />
-						<span className='text-xs text-slate-400'>Отдельная линия</span>
-					</div>
 				</div>
 			</div>
 		</section>
 	);
 }
 
-// function StatusPanel({ enabledCount, totalCount }) {
-// 	const allEnabled = enabledCount === totalCount;
-// 	const allDisabled = enabledCount === 0;
-
-// 	const message = allEnabled
-// 		? 'Все линии включены'
-// 		: allDisabled
-// 			? 'Все линии отключены'
-// 			: `Включено линий: ${enabledCount} из ${totalCount}`;
-
-// 	return (
-// 		<aside className='flex flex-col justify-between gap-4 rounded-2xl border border-white/8 bg-[#0e141e] p-5 sm:flex-row sm:items-center'>
-// 			<div className='flex items-start gap-3'>
-// 				<div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-400/10 text-emerald-300'>
-// 					<Activity size={20} />
-// 				</div>
-
-// 				<div>
-// 					<h2 className='font-medium text-white'>{message}</h2>
-// 					<p className='mt-1 text-sm leading-5 text-slate-500'>
-// 						Визуальное состояние панели. Реальное наличие напряжения приложение
-// 						не измеряет.
-// 					</p>
-// 				</div>
-// 			</div>
-
-// 			<div className='flex items-center gap-2 text-xs text-slate-500'>
-// 				<span>HOME POWER</span>
-// 				<ArrowUpRight size={14} />
-// 			</div>
-// 		</aside>
-// 	);
-// }
-
 function App() {
 	const [breakerStates, setBreakerStates] = useState({
 		teal: true,
 		blue: true,
-		rose: true
+		rose: true,
+		auxA: true,
+		auxB: true
 	});
 
 	const enabledCount = Object.values(breakerStates).filter(Boolean).length;
@@ -443,16 +412,16 @@ function App() {
 						</p>
 
 						<h2 className='mt-2 text-2xl font-semibold tracking-tight text-white sm:text-3xl'>
-							Управление электрикой
+							Управління електрикою
 						</h2>
 
 						<p className='mt-2 max-w-2xl text-sm leading-6 text-slate-400'>
-							Контролируй линии электроснабжения и смотри, какие точки относятся
-							к каждому рубильнику.
+							Контролюй лінії електропостачання та дивись, які точки відносяться
+							до кожного рубильника.
 						</p>
 					</div>
 
-					<div className='grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3'>
+					<div className='grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 xl:grid-cols-3'>
 						{breakers.map(breaker => (
 							<BreakerCard
 								key={breaker.id}
@@ -472,10 +441,6 @@ function App() {
 				<section className='mt-8'>
 					<ApartmentMap breakerStates={breakerStates} />
 				</section>
-
-				{/* <section className='mt-4'>
-					<StatusPanel enabledCount={enabledCount} totalCount={totalCount} />
-				</section> */}
 
 				<footer className='mt-8 flex flex-wrap items-center justify-between gap-2 border-t border-white/6 pt-5 text-xs text-slate-600'>
 					<span>HOME POWER © 2026</span>
