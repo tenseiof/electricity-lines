@@ -322,13 +322,13 @@ function BreakerCard({ breaker, isEnabled, onToggle, isSelected }) {
 					aria-checked={isEnabled}
 					aria-label={`${breaker.name}: ${isEnabled ? 'вимкнути' : 'увімкнути'}`}
 					onClick={onToggle}
-					className='relative h-6 w-11 shrink-0 rounded-full transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50'
+					className='relative h-5 w-9 shrink-0 rounded-full transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50'
 					style={{
 						backgroundColor: isEnabled ? color : THEME.switchOff
 					}}
 				>
 					<span
-						className={`absolute top-1 h-4 w-4 rounded-full shadow transition-all duration-300 ${
+						className={`absolute top-1 h-3 w-3 rounded-full shadow transition-all duration-300 ${
 							isEnabled ? 'right-1' : 'left-1'
 						}`}
 						style={{
@@ -415,7 +415,7 @@ function ApartmentMap({ breakerStates, selectedBreakerId, onSelectBreaker }) {
 										top: `${point.y}%`,
 										translate: '-50% -50%',
 										backgroundColor: isEnabled ? color : THEME.muted,
-										borderColor: isEnabled ? color : THEME.switchKnobOff,
+										borderColor: isEnabled ? '#ffffff' : THEME.switchKnobOff,
 										boxShadow: isEnabled
 											? `0 0 8px ${color}, 0 0 18px ${color}80`
 											: 'none',
@@ -452,11 +452,11 @@ function ApartmentMap({ breakerStates, selectedBreakerId, onSelectBreaker }) {
 								type='button'
 								onClick={() => onSelectBreaker(breaker.id)}
 								aria-pressed={isSelected}
-								className='flex items-center gap-2 rounded-md px-2 py-1 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60'
+								className='flex items-center gap-2 rounded-md border border-transparent px-2 py-1 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60'
 								style={{
 									backgroundColor: isSelected ? `${color}18` : 'transparent',
 									opacity: isEnabled ? 1 : 0.55,
-									outline: isSelected ? `1px solid ${color}66` : 'none'
+									borderColor: isSelected ? `${color}66` : 'transparent'
 								}}
 							>
 								<span
@@ -501,6 +501,13 @@ function App() {
 		setSelectedBreakerId(prev => (prev === id ? null : id));
 	};
 
+	const handleToggleBreaker = id => {
+		setBreakerStates(prev => ({
+			...prev,
+			[id]: !prev[id]
+		}));
+	};
+
 	return (
 		<main className='min-h-screen bg-[#090d14] px-4 py-6 text-slate-100 sm:px-6 sm:py-9 lg:px-10'>
 			<div className='mx-auto max-w-7xl'>
@@ -529,12 +536,7 @@ function App() {
 								breaker={breaker}
 								isEnabled={breakerStates[breaker.id]}
 								isSelected={selectedBreakerId === breaker.id}
-								onToggle={() => {
-									setBreakerStates(prev => ({
-										...prev,
-										[breaker.id]: !prev[breaker.id]
-									}));
-								}}
+								onToggle={() => handleToggleBreaker(breaker.id)}
 							/>
 						))}
 					</div>
