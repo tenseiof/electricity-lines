@@ -10,6 +10,25 @@ const LINE_COLORS = {
 	auxB: '#C49A6C'
 };
 
+const THEME = {
+	page: '#090d14',
+	cardOff: '#0e141e',
+	cardBorderOff: '#334155',
+	mapSection: '#0e141e',
+	mapCanvas: '#0a1019',
+
+	iconOff: '#1e293b',
+	muted: '#64748b',
+	statusOff: '#475569',
+
+	switchOff: '#334155',
+	switchKnobOff: '#94a3b8',
+	switchKnobOn: '#020617',
+
+	lightingOverlay: '#090d14',
+	lightingOverlayOpacity: 0.65
+};
+
 const breakers = [
 	// Line 1 — розетки и свет
 	{
@@ -236,25 +255,33 @@ function Header({ enabledCount, totalCount }) {
 	);
 }
 
-function BreakerCard({ breaker, isEnabled, onToggle }) {
+function BreakerCard({ breaker, isEnabled, onToggle, isSelected }) {
 	const Icon = breaker.icon;
-
 	const color = LINE_COLORS[breaker.color];
 
 	return (
 		<article
-			className='rounded-2xl border p-5 transition duration-200 hover:-translate-y-1 hover:bg-white/4'
+			className='rounded-2xl border p-5 transition duration-200 hover:-translate-y-1'
 			style={{
-				borderColor: `${color}33`,
-				backgroundColor: `${color}0D`
+				borderColor: isSelected
+					? LINE_COLORS[breaker.color]
+					: isEnabled
+						? `${LINE_COLORS[breaker.color]}33`
+						: THEME.cardBorderOff,
+				backgroundColor: isEnabled
+					? `${LINE_COLORS[breaker.color]}0D`
+					: THEME.cardOff,
+				boxShadow: isSelected
+					? `0 0 0 1px ${LINE_COLORS[breaker.color]}66, 0 0 20px ${LINE_COLORS[breaker.color]}18`
+					: 'none'
 			}}
 		>
 			<div className='flex items-start justify-between'>
 				<div
-					className={`flex h-11 w-11 items-center justify-center rounded-xl`}
+					className='flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-300'
 					style={{
-						backgroundColor: `${color}1A`,
-						color
+						backgroundColor: isEnabled ? `${color}1A` : THEME.iconOff,
+						color: isEnabled ? color : THEME.muted
 					}}
 				>
 					<Icon size={22} />
@@ -274,14 +301,17 @@ function BreakerCard({ breaker, isEnabled, onToggle }) {
 			<div className='mt-5 flex items-center justify-between border-t border-white/[0.07] pt-4'>
 				<div className='flex items-center gap-2'>
 					<span
-						className={`h-2 w-2 rounded-full ${
-							isEnabled ? '' : 'bg-slate-600'
-						}`}
+						className='h-2 w-2 rounded-full transition-all duration-300'
 						style={{
-							backgroundColor: isEnabled ? color : undefined
+							backgroundColor: isEnabled ? color : THEME.statusOff,
+							boxShadow: isEnabled ? `0 0 8px ${color}80` : 'none'
 						}}
 					/>
-					<span className='text-xs font-medium' style={{ color }}>
+
+					<span
+						className='text-xs font-medium transition-colors duration-300'
+						style={{ color: isEnabled ? color : THEME.muted }}
+					>
 						{isEnabled ? 'Увімкнена' : 'Вимкнена'}
 					</span>
 				</div>
@@ -290,19 +320,22 @@ function BreakerCard({ breaker, isEnabled, onToggle }) {
 					type='button'
 					role='switch'
 					aria-checked={isEnabled}
-					aria-label={`${breaker.name}: ${isEnabled ? 'выключить' : 'включить'}`}
+					aria-label={`${breaker.name}: ${isEnabled ? 'вимкнути' : 'увімкнути'}`}
 					onClick={onToggle}
-					className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
-						isEnabled ? '' : 'bg-slate-700'
-					}`}
+					className='relative h-6 w-11 shrink-0 rounded-full transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50'
 					style={{
-						backgroundColor: isEnabled ? color : undefined
+						backgroundColor: isEnabled ? color : THEME.switchOff
 					}}
 				>
 					<span
-						className={`absolute top-1 h-4 w-4 rounded-full bg-slate-950 shadow transition-all ${
+						className={`absolute top-1 h-4 w-4 rounded-full shadow transition-all duration-300 ${
 							isEnabled ? 'right-1' : 'left-1'
 						}`}
+						style={{
+							backgroundColor: isEnabled
+								? THEME.switchKnobOn
+								: THEME.switchKnobOff
+						}}
 					/>
 				</button>
 			</div>
@@ -310,9 +343,12 @@ function BreakerCard({ breaker, isEnabled, onToggle }) {
 	);
 }
 
-function ApartmentMap({ breakerStates }) {
+function ApartmentMap({ breakerStates, selectedBreakerId, onSelectBreaker }) {
 	return (
-		<section className='overflow-hidden rounded-2xl border border-white/8 bg-[#0e141e]'>
+		<section
+			className='overflow-hidden rounded-2xl border border-white/8'
+			style={{ backgroundColor: THEME.mapSection }}
+		>
 			<div className='flex flex-wrap items-center justify-between gap-3 border-b border-white/8 px-5 py-4'>
 				<div className='flex items-center gap-3'>
 					<House size={18} className='text-slate-400' />
@@ -330,58 +366,117 @@ function ApartmentMap({ breakerStates }) {
 			</div>
 
 			<div className='p-4 sm:p-6'>
-				<div className='relative flex min-h-75 items-center justify-center overflow-hidden rounded-xl border border-white/6 bg-[#0a1019] p-6'>
-					<div className='relative overflow-hidden rounded-xl border border-white/6 bg-black'>
+				<div className='relative flex min-h-75 items-center justify-center rounded-xl border border-white/6 bg-[#0a1019] p-6'>
+					<div
+						className='relative rounded-xl border border-white/6 bg-black'
+						style={{ backgroundColor: THEME.mapCanvas }}
+						onClick={() => onSelectBreaker(null)}
+					>
 						<img
-							src='/images/apartment-plan.png'
+							src='/images/apartment-plan-mini.png'
 							alt='Apartment floor plan'
-							className='block h-auto w-full select-none'
+							className='block h-auto w-full select-none rounded-xl'
 							draggable='false'
+						/>
+						<div
+							className='pointer-events-none absolute inset-0 z-0 transition-opacity duration-500'
+							style={{
+								backgroundColor: THEME.lightingOverlay,
+								opacity: breakerStates.teal ? 0 : THEME.lightingOverlayOpacity
+							}}
+							aria-hidden='true'
 						/>
 
 						{electricalPoints.map(point => {
 							const isEnabled = breakerStates[point.breakerId] ?? true;
 							const color = LINE_COLORS[point.breakerId];
+							const breaker = breakers.find(
+								item => item.id === point.breakerId
+							);
+
+							const isSelected = selectedBreakerId === point.breakerId;
 
 							return (
 								<button
 									key={point.id}
 									type='button'
-									title={point.label}
-									aria-label={`${point.label} — ${isEnabled ? 'ON' : 'OFF'}`}
-									className='absolute z-10 rounded-full border-2 transition-all duration-300'
+									title={`${breaker.name} · ${isEnabled ? 'Увімкнена' : 'Вимкнена'}`}
+									aria-label={`${breaker.name} · ${isEnabled ? 'Увімкнена' : 'Вимкнена'}`}
+									aria-pressed={isSelected}
+									onClick={event => {
+										event.stopPropagation();
+										onSelectBreaker(point.breakerId);
+									}}
+									className={`group absolute z-10 h-2.5 w-2.5 rounded-full border-2 transition-[width,height,scale,box-shadow] duration-200 hover:z-30 focus-visible:z-30 sm:h-4 sm:w-4 ${
+										isSelected ? 'z-20 scale-125' : ''
+									}`}
 									style={{
 										left: `${point.x}%`,
 										top: `${point.y}%`,
-										width: '13px',
-										height: '13px',
-										transform: 'translate(-50%, -50%)',
-										backgroundColor: isEnabled ? color : '#64748b',
-										borderColor: isEnabled ? '#ffffff' : '#94a3b8',
+										translate: '-50% -50%',
+										backgroundColor: isEnabled ? color : THEME.muted,
+										borderColor: isEnabled ? color : THEME.switchKnobOff,
 										boxShadow: isEnabled
 											? `0 0 8px ${color}, 0 0 18px ${color}80`
 											: 'none',
-										opacity: isEnabled ? 1 : 0.55
+										opacity: isEnabled ? 1 : 0.55,
+										outline: isSelected ? `2px solid ${color}` : 'none',
+										outlineOffset: '3px'
 									}}
-								/>
+								>
+									<span className='pointer-events-none absolute bottom-full left-1/2 z-30 mb-3 w-max max-w-48 -translate-x-1/2 rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-left text-xs text-white opacity-0 shadow-xl transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100'>
+										<span className='block font-medium'>{breaker.name}</span>
+
+										<span
+											className='mt-1 block'
+											style={{ color: isEnabled ? color : THEME.switchKnobOff }}
+										>
+											{isEnabled ? 'Увімкнена' : 'Вимкнена'}
+										</span>
+									</span>
+								</button>
 							);
 						})}
 					</div>
 				</div>
 
 				<div className='mt-4 flex flex-wrap gap-x-5 gap-y-3'>
-					{breakers.map(breaker => (
-						<div key={breaker.id} className='flex items-center gap-2'>
-							<span
-								className='h-2.5 w-2.5 shrink-0 rounded-full'
-								style={{
-									backgroundColor: LINE_COLORS[breaker.color]
-								}}
-							/>
+					{breakers.map(breaker => {
+						const color = LINE_COLORS[breaker.color];
+						const isSelected = selectedBreakerId === breaker.id;
+						const isEnabled = breakerStates[breaker.id];
 
-							<span className='text-xs text-slate-400'>{breaker.name}</span>
-						</div>
-					))}
+						return (
+							<button
+								key={breaker.id}
+								type='button'
+								onClick={() => onSelectBreaker(breaker.id)}
+								aria-pressed={isSelected}
+								className='flex items-center gap-2 rounded-md px-2 py-1 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60'
+								style={{
+									backgroundColor: isSelected ? `${color}18` : 'transparent',
+									opacity: isEnabled ? 1 : 0.55,
+									outline: isSelected ? `1px solid ${color}66` : 'none'
+								}}
+							>
+								<span
+									className='h-2.5 w-2.5 shrink-0 rounded-full transition-all duration-200'
+									style={{
+										backgroundColor: isEnabled ? color : THEME.muted,
+										boxShadow:
+											isSelected && isEnabled ? `0 0 8px ${color}` : 'none'
+									}}
+								/>
+
+								<span
+									className='text-xs transition-colors duration-200'
+									style={{ color: isSelected ? color : THEME.switchKnobOff }}
+								>
+									{breaker.name}
+								</span>
+							</button>
+						);
+					})}
 				</div>
 			</div>
 		</section>
@@ -397,8 +492,14 @@ function App() {
 		auxB: true
 	});
 
+	const [selectedBreakerId, setSelectedBreakerId] = useState(null);
+
 	const enabledCount = Object.values(breakerStates).filter(Boolean).length;
 	const totalCount = breakers.length;
+
+	const handleSelectBreaker = id => {
+		setSelectedBreakerId(prev => (prev === id ? null : id));
+	};
 
 	return (
 		<main className='min-h-screen bg-[#090d14] px-4 py-6 text-slate-100 sm:px-6 sm:py-9 lg:px-10'>
@@ -427,6 +528,7 @@ function App() {
 								key={breaker.id}
 								breaker={breaker}
 								isEnabled={breakerStates[breaker.id]}
+								isSelected={selectedBreakerId === breaker.id}
 								onToggle={() => {
 									setBreakerStates(prev => ({
 										...prev,
@@ -439,7 +541,11 @@ function App() {
 				</section>
 
 				<section className='mt-8'>
-					<ApartmentMap breakerStates={breakerStates} />
+					<ApartmentMap
+						breakerStates={breakerStates}
+						selectedBreakerId={selectedBreakerId}
+						onSelectBreaker={handleSelectBreaker}
+					/>
 				</section>
 
 				<footer className='mt-8 flex flex-wrap items-center justify-between gap-2 border-t border-white/6 pt-5 text-xs text-slate-600'>
