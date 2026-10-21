@@ -43,7 +43,7 @@ export function ApartmentMap({
 						onClick={() => onSelectBreaker(null)}
 					>
 						<img
-							src='/images/apartment-plan-mini.png'
+							src={`${import.meta.env.BASE_URL}images/apartment-plan-mini.png`}
 							alt='Apartment floor plan'
 							className='block h-auto w-full select-none rounded-xl'
 							draggable='false'
