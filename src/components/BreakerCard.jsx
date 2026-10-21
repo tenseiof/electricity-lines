@@ -1,3 +1,4 @@
+// constant
 import { THEME, LINE_COLORS } from '../constants/theme';
 
 export function BreakerCard({ breaker, isEnabled, onToggle, isSelected }) {

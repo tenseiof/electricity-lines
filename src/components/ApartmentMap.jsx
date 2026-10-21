@@ -1,7 +1,9 @@
 import { House, Zap } from 'lucide-react';
 
+//constant
 import { THEME, LINE_COLORS } from '../constants/theme';
 
+// data
 import { breakers } from '../data/breakers';
 import { electricalPoints } from '../data/electricalPoints';
 
